@@ -13,8 +13,8 @@ import {z} from 'genkit';
 
 const MCQSchema = z.object({
   question: z.string().describe('The text of the question.'),
-  options: z.array(z.string()).length(4).describe('Four possible answers to the question.'),
-  correctAnswerIndex: z.number().int().min(0).max(3).describe('The index of the correct answer in the options array.'),
+  options: z.array(z.string()).length(4).describe('An array of exactly four possible answers to the question.'),
+  correctAnswerIndex: z.number().int().min(0).max(3).describe('The 0-based index of the correct answer in the options array.'),
   difficulty: z.enum(['easy', 'medium', 'hard']).describe('The difficulty level of the question.'),
 });
 
@@ -24,28 +24,10 @@ const GenerateMCQsInputSchema = z.object({
 export type GenerateMCQsInput = z.infer<typeof GenerateMCQsInputSchema>;
 
 const GenerateMCQsOutputSchema = z.object({
-  mcqs: z.array(MCQSchema).length(5).describe('An array of 5 MCQs for the given topic.'),
+  mcqs: z.array(MCQSchema).length(5).describe('An array of exactly 5 MCQs for the given topic.'),
 });
 export type GenerateMCQsOutput = z.infer<typeof GenerateMCQsOutputSchema>;
 
-const classifyDifficultyTool = ai.defineTool({
-  name: 'classifyDifficulty',
-  description: 'Classifies the difficulty level of a question based on its complexity and the knowledge required to answer it.',
-  inputSchema: z.object({
-    question: z.string().describe('The question to classify.'),
-    topic: z.string().describe('The topic the question belongs to.'),
-  }),
-  outputSchema: z.enum(['easy', 'medium', 'hard']),
-}, async (input) => {
-  // Basic implementation (can be improved with a more sophisticated difficulty assessment).
-  if (input.question.length < 50) {
-    return 'easy';
-  } else if (input.question.length < 100) {
-    return 'medium';
-  } else {
-    return 'hard';
-  }
-});
 
 export async function generateMCQs(input: GenerateMCQsInput): Promise<GenerateMCQsOutput> {
   return generateMCQsFlow(input);
@@ -55,19 +37,20 @@ const generateMCQsPrompt = ai.definePrompt({
   name: 'generateMCQsPrompt',
   input: {schema: GenerateMCQsInputSchema},
   output: {schema: GenerateMCQsOutputSchema},
-  tools: [classifyDifficultyTool],
   model: 'googleai/gemini-1.5-flash-latest',
-  prompt: `You are an expert in generating multiple-choice questions (MCQs). Your task is to generate exactly 5 MCQs for the topic: {{{topic}}}.
+  prompt: `You are an expert quiz generator. Your task is to generate a JSON object containing exactly 5 multiple-choice questions (MCQs) for the topic: {{{topic}}}.
 
-You must adhere to the following constraints:
-1.  Generate **exactly 5** multiple-choice questions.
-2.  Each question must have exactly 4 options.
-3.  For each question, designate one option as the correct answer.
-4.  Use the 'classifyDifficulty' tool to assign a difficulty level ('easy', 'medium', or 'hard') to each question.
-5.  Ensure the questions are diverse and cover various aspects of the topic.
-6.  You MUST provide your response in the specified JSON format.
+You MUST adhere to the following strict constraints:
+1.  The output MUST be a single JSON object.
+2.  The JSON object must have a key named "mcqs".
+3.  The value of "mcqs" MUST be an array of EXACTLY 5 question objects.
+4.  Each question object in the array must contain:
+    - "question": A string for the question text.
+    - "options": An array of EXACTLY 4 strings representing the possible answers.
+    - "correctAnswerIndex": An integer from 0 to 3, representing the index of the correct answer in the "options" array.
+    - "difficulty": A string that is one of "easy", "medium", or "hard".
 
-Produce the output in the specified JSON format.`,
+Do not deviate from this format. Your entire response must be only the specified JSON object.`,
 });
 
 const generateMCQsFlow = ai.defineFlow(
