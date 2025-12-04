@@ -1,14 +1,20 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import type { Topic, MCQ } from '@/lib/topics';
+import type { MCQ } from '@/lib/topics';
 import QuizLoader from '@/components/QuizLoader';
 import QuestionDisplay from '@/components/QuestionDisplay';
 import ResultsDisplay from '@/components/ResultsDisplay';
 
 type QuizState = 'loading' | 'active' | 'results';
 
-export default function Quiz({ topic }: { topic: Topic }) {
+interface QuizProps {
+  name: string;
+  description: string;
+  mcqs: MCQ[];
+}
+
+export default function Quiz({ name, mcqs: initialMcqs }: QuizProps) {
   const [quizState, setQuizState] = useState<QuizState>('loading');
   const [mcqs, setMcqs] = useState<MCQ[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -18,13 +24,13 @@ export default function Quiz({ topic }: { topic: Topic }) {
   useEffect(() => {
     // Simulate loading to prevent jarring UI shift
     const timer = setTimeout(() => {
-      setMcqs(topic.mcqs);
-      setUserAnswers(new Array(topic.mcqs.length).fill(-1));
+      setMcqs(initialMcqs);
+      setUserAnswers(new Array(initialMcqs.length).fill(-1));
       setQuizState('active');
     }, 500); // 0.5 second delay
 
     return () => clearTimeout(timer);
-  }, [topic]);
+  }, [initialMcqs]);
 
   const handleAnswerSelect = (questionIndex: number, answerIndex: number) => {
     const newAnswers = [...userAnswers];
@@ -57,7 +63,7 @@ export default function Quiz({ topic }: { topic: Topic }) {
   const renderContent = () => {
     switch (quizState) {
       case 'loading':
-        return <QuizLoader message={`Loading ${topic.name} quiz...`} />;
+        return <QuizLoader message={`Loading ${name} quiz...`} />;
       case 'active':
         if (!currentMCQ) return <QuizLoader message="Loading question..." />;
         return (
@@ -79,7 +85,7 @@ export default function Quiz({ topic }: { topic: Topic }) {
             score={score}
             totalQuestions={mcqs.length}
             feedback="Great job completing the quiz! Review your answers and try another topic to expand your knowledge."
-            topicName={topic.name}
+            topicName={name}
           />
         );
       default:

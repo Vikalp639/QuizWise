@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { topics, type Topic } from '@/lib/topics';
+import { topics } from '@/lib/topics';
 import Quiz from '@/components/Quiz';
 
 export async function generateStaticParams() {
@@ -15,9 +15,12 @@ export default function QuizPage({ params }: { params: { topic: string } }) {
     notFound();
   }
 
+  // We only pass the serializable properties to the client component
+  const { name, description, mcqs } = topic;
+
   return (
     <main>
-      <Quiz topic={topic} />
+      <Quiz name={name} description={description} mcqs={mcqs} />
     </main>
   );
 }
