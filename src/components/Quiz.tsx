@@ -1,6 +1,5 @@
 'use client';
 
-import type { Topic } from '@/lib/topics';
 import { useState, useEffect, useMemo } from 'react';
 import { generateMCQs, type GenerateMCQsOutput } from '@/ai/flows/generate-mcqs';
 import { generatePersonalizedFeedback } from '@/ai/flows/generate-personalized-feedback';
@@ -12,7 +11,7 @@ import ResultsDisplay from '@/components/ResultsDisplay';
 type QuizState = 'loading' | 'active' | 'submitting' | 'results';
 type MCQ = GenerateMCQsOutput['mcqs'][0];
 
-export default function Quiz({ topic }: { topic: Topic }) {
+export default function Quiz({ topicName }: { topicName: string }) {
   const [quizState, setQuizState] = useState<QuizState>('loading');
   const [mcqs, setMcqs] = useState<MCQ[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -24,7 +23,7 @@ export default function Quiz({ topic }: { topic: Topic }) {
   useEffect(() => {
     const fetchMCQs = async () => {
       try {
-        const result = await generateMCQs({ topic: topic.name });
+        const result = await generateMCQs({ topic: topicName });
         if (result.mcqs && result.mcqs.length > 0) {
           setMcqs(result.mcqs);
           setUserAnswers(new Array(result.mcqs.length).fill(-1));
@@ -43,7 +42,7 @@ export default function Quiz({ topic }: { topic: Topic }) {
       }
     };
     fetchMCQs();
-  }, [topic, toast]);
+  }, [topicName, toast]);
 
   const handleAnswerSelect = (questionIndex: number, answerIndex: number) => {
     const newAnswers = [...userAnswers];
@@ -74,7 +73,7 @@ export default function Quiz({ topic }: { topic: Topic }) {
       const { feedback } = await generatePersonalizedFeedback({
         score: calculatedScore,
         totalQuestions: mcqs.length,
-        topic: topic.name,
+        topic: topicName,
       });
       setFeedback(feedback);
       setQuizState('results');
@@ -95,7 +94,7 @@ export default function Quiz({ topic }: { topic: Topic }) {
   const renderContent = () => {
     switch (quizState) {
       case 'loading':
-        return <QuizLoader message={`Generating ${topic.name} quiz...`} />;
+        return <QuizLoader message={`Generating ${topicName} quiz...`} />;
       case 'submitting':
         return <QuizLoader message="Calculating results and generating feedback..." />;
       case 'active':
@@ -119,7 +118,7 @@ export default function Quiz({ topic }: { topic: Topic }) {
             score={score}
             totalQuestions={mcqs.length}
             feedback={feedback}
-            topicName={topic.name}
+            topicName={topicName}
           />
         );
       default:

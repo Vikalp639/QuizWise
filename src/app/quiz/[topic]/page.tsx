@@ -17,7 +17,7 @@ export default function QuizPage({ params }: { params: { topic: string } }) {
 
   return (
     <main>
-      <Quiz topic={topic} />
+      <Quiz topicName={topic.name} />
     </main>
   );
 }
