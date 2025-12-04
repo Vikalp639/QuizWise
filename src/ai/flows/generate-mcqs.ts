@@ -37,6 +37,7 @@ const generateMCQsPrompt = ai.definePrompt({
   name: 'generateMCQsPrompt',
   input: {schema: GenerateMCQsInputSchema},
   output: {schema: GenerateMCQsOutputSchema},
+  model: 'googleai/gemini-pro',
   prompt: `You are an expert quiz generator. Your task is to generate a JSON object containing exactly 5 multiple-choice questions (MCQs) for the topic: {{{topic}}}.
 
 You MUST adhere to the following strict constraints:
