@@ -56,6 +56,7 @@ const generateMCQsPrompt = ai.definePrompt({
   input: {schema: GenerateMCQsInputSchema},
   output: {schema: GenerateMCQsOutputSchema},
   tools: [classifyDifficultyTool],
+  model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are an expert in generating multiple-choice questions (MCQs). Your task is to generate exactly 5 MCQs for the topic: {{{topic}}}.
 
 You must adhere to the following constraints:
@@ -64,6 +65,7 @@ You must adhere to the following constraints:
 3.  For each question, designate one option as the correct answer.
 4.  Use the 'classifyDifficulty' tool to assign a difficulty level ('easy', 'medium', or 'hard') to each question.
 5.  Ensure the questions are diverse and cover various aspects of the topic.
+6.  You MUST provide your response in the specified JSON format.
 
 Produce the output in the specified JSON format.`,
 });
