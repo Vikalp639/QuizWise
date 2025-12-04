@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Award, BrainCircuit } from 'lucide-react';
+import { Award, BookOpen } from 'lucide-react';
 
 interface ResultsDisplayProps {
   score: number;
@@ -32,8 +32,8 @@ export default function ResultsDisplay({ score, totalQuestions, feedback, topicN
         
         <div className="space-y-4">
             <h3 className="flex items-center font-headline text-xl font-semibold text-primary">
-                <BrainCircuit className="mr-3 h-6 w-6" />
-                AI-Generated Feedback
+                <BookOpen className="mr-3 h-6 w-6" />
+                Next Steps
             </h3>
             <blockquote className="border-l-4 border-primary pl-4 py-2 bg-background">
                 <p className="text-muted-foreground italic">

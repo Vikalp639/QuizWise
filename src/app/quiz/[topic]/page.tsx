@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { topics } from '@/lib/topics';
+import { topics, type Topic } from '@/lib/topics';
 import Quiz from '@/components/Quiz';
 
 export async function generateStaticParams() {
@@ -17,7 +17,7 @@ export default function QuizPage({ params }: { params: { topic: string } }) {
 
   return (
     <main>
-      <Quiz topicName={topic.name} />
+      <Quiz topic={topic} />
     </main>
   );
 }
