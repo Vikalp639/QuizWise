@@ -56,15 +56,16 @@ const generateMCQsPrompt = ai.definePrompt({
   input: {schema: GenerateMCQsInputSchema},
   output: {schema: GenerateMCQsOutputSchema},
   tools: [classifyDifficultyTool],
-  prompt: `You are an expert in generating multiple-choice questions (MCQs) for various topics. Generate 5 MCQs for the topic: {{{topic}}}.
+  prompt: `You are an expert in generating multiple-choice questions (MCQs). Your task is to generate exactly 5 MCQs for the topic: {{{topic}}}.
 
-Each MCQ should have 4 options, and only one correct answer. The difficulty levels of the questions should vary (easy, medium, and hard).
+You must adhere to the following constraints:
+1.  Generate **exactly 5** multiple-choice questions.
+2.  Each question must have exactly 4 options.
+3.  For each question, designate one option as the correct answer.
+4.  Use the 'classifyDifficulty' tool to assign a difficulty level ('easy', 'medium', or 'hard') to each question.
+5.  Ensure the questions are diverse and cover various aspects of the topic.
 
-Ensure that the generated MCQs are diverse and cover different aspects of the topic. Use the classifyDifficulty tool to set the difficulty level of the questions. If a generated question does not fit the topic, generate an alternative.
-
-Output the MCQs in the following JSON format:
-
-${JSON.stringify(GenerateMCQsOutputSchema.shape, null, 2)}`,
+Produce the output in the specified JSON format.`,
 });
 
 const generateMCQsFlow = ai.defineFlow(
